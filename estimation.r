@@ -16,3 +16,14 @@ x <- c(x0, x1)
 #y is known for the historical data
 truey <- c(rep(0,length(x0)), rep(1,length(x1)))
 findBoundary(x,y)
+
+
+#set up axes
+xaxis <- seq(4,7,length=1000)
+yaxis <- seq(0,1.2,length=1000)
+plot(xaxis,yaxis,type=’n’)
+#plot kernel density estimates
+lines(density(x0))
+lines(density(x1),col=’red’)
+#add decision boundary
+abline(v=5.42,lty=3,lwd=2)
