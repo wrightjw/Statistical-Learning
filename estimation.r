@@ -31,10 +31,7 @@ abline(v=5.42,lty=3,lwd=2)
 #performance assessment
 y <- c(rep(0,length(x0)), rep(1,length(x1)))
 n <- length(x)
-#randomly choose the training set. We do it by selecting indexes so that we assign paired vales of x and y to both sets. The set.seed
-#function initialises the ranodm number generator so that we get
-#the same random numbers every time we run the code (so the
-# results can be replicated)
+#randomly choose the training set.
 set.seed(1)
 trainindices <- sample(1:n, round(0.66*n), replace=FALSE)
 trainx <- x[trainindices]
