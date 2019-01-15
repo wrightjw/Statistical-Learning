@@ -27,3 +27,9 @@ lines(density(x0))
 lines(density(x1),col=’red’)
 #add decision boundary
 abline(v=5.42,lty=3,lwd=2)
+
+#performance assessment
+y <-numeric(length(x))
+y[x<=gamma] <- 0
+y[x>gamma] <- 1
+sum(y!=truey)/length(y)
