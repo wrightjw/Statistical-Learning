@@ -1,0 +1,87 @@
+---
+title: "Statistical Learning Assignment 1"
+author: "James Wright"
+date: "2 February 2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Question 4
+
+```{r echo=TRUE,eval=TRUE}
+#importing libraries
+library(MASS)
+library(class)
+```
+
+## Part 1
+
+```{r echo=FALSE}
+#importing and formatting data
+spam <- read.table("C:\\Users\\wrigh\\OneDrive\\Desktop\\spambase.data",skip=0,sep=',')
+spam <- as.data.frame(spam)
+```
+
+## Part 2
+
+```{r echo=FALSE}
+#building test and training sets
+n<-dim(spam)[1];
+test <- spam[seq(10, n, 10), ]
+train <- spam[-c(seq(10, n, 10)), ]
+```
+
+## Part 3
+
+```{r echo=TRUE}
+#train, predict, performance assessment of linear model
+fit.l <- lda(V58 ~. , data = train, prior = c(0.5, 0.5))
+predict.l <- predict(fit.l, test)
+accuracy.l <- sum(predict.l$class == test[, 58])/length(predict.l$class)
+accuracy.l
+```
+
+```{r echo=TRUE}
+#train, predict, performance assessment of quadratic model
+fit.q <- qda(V58 ~. , data = train, prior = c(0.5, 0.5))
+predict.q <- predict(fit.q, test)
+accuracy.q <- sum(predict.q$class == test[, 58])/length(predict.q$class)
+accuracy.q
+```
+
+## Part 4
+
+```{r echo=TRUE}
+#train, predict, performance assessment of k nearest neighbours model (unnormalised)
+predict.k <- knn(train = train, test = test, cl = train[1:dim(train)[1], 58], k=3)
+accuracy.k <- sum(predict.k == test[,58])/length(predict.k)
+accuracy.k
+```
+
+\pagebreak
+
+## Part 5
+
+```{r echo=TRUE}
+#train, predict, performance assessment of k nearest neighbours model(normalised)
+mus <- apply(train[, 1:57], 2 , mean)
+sigmas <- apply(train[, 1:57], 2, sd)
+
+for (i in 1:57){
+  train[, i] <- (train[, i] - mus[i])/sigmas[i]
+}
+
+for (i in 1:57){
+  test[,i] <- (test[, i] - mus[i])/sigmas[i]
+}
+
+predict.kn <- knn(train = train[, 1:57], test = test[, 1:57], cl = train[, 58], k=3)
+accuracy.kn <- sum(predict.kn == test[, 58])/length(predict.kn)
+accuracy.kn
+```
+
+
+Observe that the LDA model had a 92.0% accuracy, while the QDA model had a 83.7% accuracy. The 3-nearest-neighbour model had 83.9% accuracy when unnormalised while it had 90.4% accuracy when normalised.
