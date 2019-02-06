@@ -1,13 +1,167 @@
 ---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+---
 title: "Statistical Learning Assignment 1"
-author: "James Wright"
-date: "2 February 2019"
+author: James Wright
 output: pdf_document
+documentclass: article
+header-includes:
+- \usepackage{amsmath}
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+# Question 1
+
+We first find the maximum likelihood estimates for the model parameters $\theta_0, \theta_1, \lambda_0 \text{ and } \lambda_1$.
+
+We have by the maximum likelihood estimator for the Bernoulli distribution that 
+$$\hat{\theta_0} = \frac{\sum x_{1,0}}{n}=\frac{0+1+1+0}{4}=\frac{1}{2}$$ 
+
+and
+$$\hat{\theta_1} = \frac{\sum x_{1,1}}{n} = \frac{1+1+1+0}{4}=\frac{3}{4}.$$
+
+Further, by the maximum likelihod estimator for the Exponential distribution we have that
+$$\hat{\lambda_0} = \frac{n}{\sum x_{2,0}} = \frac{4}{0.14+0.75+0.31+0.97}=\frac{400}{217}\approx 1.843$$
+and
+$$\hat{\lambda_1} = \frac{n}{\sum x_{2,1}} = \frac{4}{0.14+0.09+0.45+0.27} = \frac{80}{19} \approx 4.21.$$
+
+Hence, 
+$$\mathbb{P}(x_{i,1}|y=0)=\text{Bernoulli} \left( \frac{1}{2} \right) \text{ and } \mathbb{P}(x_{i,1}|y=0)=\text{Bernoulli}\left(\frac{3}{4}\right)$$
+and 
+$$\mathbb{P}(x_{i,1}|y=1)=\text{Exponential} \left( \frac{400}{217} \right) \text{ and } \mathbb{P}(x_{i,1}|y=1)=\text{Exponential}\left(\frac{80}{19}\right)$$
+We will also assume that the prior probabilities are given by $\mathbb{P}(y_i=0)=\mathbb{P}(y_i=1)=\frac{1}{2}$. Now, to classify data with the feature values $x_{i,1} = 0$ and $x_{i,2} = 0.8$ we know that
+$$\mathbb{P}(y_i = 0 | x) \propto \mathbb{P}(y_i=0) \cdot (\hat{\theta}_0)^{x_{i,1}}(1-\hat{\theta}_0)^{1-x_{i,1}} \cdot \hat{\lambda_0} e^{- \hat{\lambda_0 x_{i,2}}} = \frac{1}{2} \cdot  \left(\frac{1}{2}\right)^0 \left( 1-\frac{1}{2}\right)^1 \cdot \frac{400}{217} e^{-\frac{400}{217}\cdot0.8} \approx 0.10546$$
+
+and
+
+$$\mathbb{P}(y_i = 1 | x) \propto \mathbb{P}(y_i=1) \cdot (\hat{\theta}_1)^{x_{i,1}}(1-\hat{\theta}_1)^{1-x_{i,1}} \cdot \hat{\lambda_1} e^{- \hat{\lambda_1 x_{i,2}}} = \frac{1}{2} \cdot \left(\frac{3}{4}\right)^0 \left( 1-\frac{3}{4} \right)^1 \cdot \frac{80}{19} \cdot e^{-\frac{80}{19} \cdot 0.8} \cdot \approx  0.01813$$
+
+By normalising these it follows that
+
+$$\mathbb{P}(y_i = 1|x) \approx \frac{0.10546}{0.10546+0.01813} = 0.85331 \text{ and } \mathbb{P}(y_i=1|x) \approx \frac{0.01813}{0.10546+0.01813} = 0.14669$$
+
+By comparing these normalised probabilties we have probabilities we see $\mathbb{P}(y_i = 0 | x)>\mathbb{P}(y_i = 1 | x)$ hence the new observation is class 0.
+
+\pagebreak
+
+# Question 2
+
+## Part 1
+
+Ignoring the boundary cases, by the $[0,1]$ uniform distribution we know that the probability of a single feature $x_1$ being within a distance of $0.05$ of the test observation $x$ is given by $$\mathbb{P}(|x - x_1|<0.05) = 1 \cdot \int_{x-0.5}^{x+0.5} 1 \text{ dt} = 1 \cdot (0.05+0.05) = 0.1. $$
+
+Hence, 10% of objects would be classed as nearby.
+
+## Part 2
+
+As the features are assumed independent, the probability $X_K$ of all $K$ features being within 0.05 of their respective test values is equivalent to the product of the probability of these features being within 0.05 of their test values. That is,  $\mathbb{P}(X_K) = 0.1^K$ by part 1.
+
+Hence for each of $k \in \{ 2,5,10,100 \}$ we have 
+$$\mathbb{P}(X_2) = 0.1^2 = \frac{1}{100}$$
+
+Hence, $1\%$.
+
+$$\mathbb{P}(X_5) = 0.1^5 = \frac{1}{100,000}$$
+
+Hence, $0.001\%$.
+
+$$\mathbb{P}(X_{10}) = 0.1^{10} = 1 \times 10^{-10}$$
+
+Hence, $10^{-8}\%$
+
+$$\mathbb{P}(X_{100}) = 0.1^{100} = 1 \times 10^{-100}$$
+Hence, $10^{-98}\%$
+
+## Part 3
+
+The length of a line such that a given feature is within $\frac{l}{2}$ of a test value is $l$, that is, a line centred at the test value.
+
+Then by the argument of Part 2 above we have  $\mathbb{P}(X_K) = l^K$ being the probability of a feature given being within $\frac{l}{2}$ of the test object values.
+
+Hence for there to be a $10\%$ chance of being contained within a $K$-dimensional hypercube centred at the test value we require $l_k^K = 0.1 \implies l = (0.1)^{\frac{1}{K}}$ to be the side-length. Then for each $k \in \{ 1,2,10,100 \}$ we have 
+$$l_1 = 0.1$$
+$$l_2 = \sqrt{0.1} \approx 0.316$$
+$$l_{10} = (0.1)^{\frac{1}{10}} \approx 0.794$$
+$$l_{100} = (0.1)^{\frac{1}{100}} \approx 0.977$$
+
+
+# Question 3
+
+We assume the prior probabilities are $\mathbb{P}(C=0)=\mathbb{P}(C=1)=\frac{1}{2}$
+
+Note also that:
+
+\[
+			\Sigma_0=
+			\begin{bmatrix}
+				0.5&4.5\\
+				4.5&140
+			\end{bmatrix} \implies \Sigma_0^{-1}= \frac{1}{49.45}
+			\begin{bmatrix}
+				140&-4.5\\
+				-4.5&0.5
+			\end{bmatrix}
+\]
+
+and
+
+\[
+			\Sigma_1=
+			\begin{bmatrix}
+				0.3&1.2\\
+				1.2&30
+			\end{bmatrix} \implies \Sigma_1^{-1}= \frac{1}{7.56}
+			\begin{bmatrix}
+				30&-1.2\\
+				-1.2&0.3
+			\end{bmatrix}
+\]
+
+Then we have
+
+\[
+\begin{aligned}
+\mathbb{P}(y=0|\vec{x_{}}) \propto \mathbb{P}(C=0) \mathbb{P} (\vec{x_{}},\vec{\mu_0},\vec{\Sigma_0}) = &  \frac{1}{2} \cdot \frac{1}{ 2 \pi \sqrt{\det(\Sigma_0)}} \cdot e^{-\frac{1}{2}(\vec{x_{}}-\vec{\mu_0})^T\Sigma_0^{-1}(\vec{x_{}}-\vec{\mu_0})} \\
+ = & \frac{1}{4 \pi \sqrt{49.75}} \cdot e^{-\frac{1}{2} \cdot \frac{1}{49.75} \begin{bmatrix}0.6 & 5\end{bmatrix} \begin{bmatrix}140&-4.5\\-4.5&0.5\end{bmatrix} \begin{bmatrix}0.6 \\ 5\end{bmatrix} } \\
+ = & \frac{1}{4 \pi \sqrt{49.75}} \cdot e^{-\frac{1}{98.9} \begin{bmatrix}61.5 & -0.2\end{bmatrix} \begin{bmatrix}0.6 \\ 5\end{bmatrix} } \\
+ = & \frac{1}{4 \pi \sqrt{49.75}} \cdot e^{-\frac{1}{98.9} \cdot 35.9 } \\
+ = & \frac{1}{4 \pi \sqrt{49.75}} \cdot e^{-\frac{359}{989} } \\
+ \approx & \frac{1}{4 \pi \sqrt{49.75}} \cdot 0.695591 = 0.00785\\
+\end{aligned}
+\]
+
+and also
+
+\[
+\begin{aligned}
+\mathbb{P}(y=1|\vec{x_{}}) \propto \mathbb{P}(C=1) \mathbb{P} (\vec{x_{}},\vec{\mu_1},\vec{\Sigma_1})
+ = & \frac{1}{2} \cdot \frac{1}{ 2 \pi \sqrt{\det(\Sigma_1)}} \cdot e^{-\frac{1}{2}(\vec{x_{}}-\vec{\mu_1})^T\Sigma_1^{-1}(\vec{x_{}}-\vec{\mu_1})} \\
+ = & \frac{1}{4 \pi \sqrt{7.56}} \cdot e^{-\frac{1}{2} \cdot \frac{1}{7.56} \begin{bmatrix}-0.5 & -2.3\end{bmatrix} \begin{bmatrix}30&-1.2\\-1.2&0.3\end{bmatrix} \begin{bmatrix}-0.5 \\ -2.3\end{bmatrix} } \\
+ = & \frac{1}{4 \pi \sqrt{7.56}} \cdot e^{-\frac{1}{15.12} \begin{bmatrix}-12.24 & -0.09\end{bmatrix} \begin{bmatrix}-0.5 \\ -2.3\end{bmatrix} } \\
+ = & \frac{1}{4 \pi \sqrt{7.56}} \cdot e^{-\frac{1}{15.2} \cdot 6.327 } \\
+ \approx & \frac{1}{4 \pi \sqrt{7.56}} \cdot 0.65806 = 0.01904\\
+\end{aligned}
+\]
+
+Normalising these terms, we obtain:
+$$\mathbb{P}(y=0 | \vec{x_{}}) \approx \frac{0.00785}{0.00785+0.01904} = 0.29193 \text{ and } \mathbb{P}(y=1|\vec{x_{}}) \approx \frac{0.01904}{0.00785+0.01904} = 0.70807$$
+Hence it is more likely to be in class 1 as $\mathbb{P}(y=0|\vec{x_{}})<\mathbb{P}(y=1|\vec{x_{}})$.
+
+
+
 
 # Question 4
 
@@ -19,7 +173,7 @@ library(class)
 
 ## Part 1
 
-```{r echo=FALSE}
+```{r echo=TRUE,eval=TRUE}
 #importing and formatting data
 spam <- read.table("C:\\Users\\wrigh\\OneDrive\\Desktop\\spambase.data",skip=0,sep=',')
 spam <- as.data.frame(spam)
@@ -27,7 +181,7 @@ spam <- as.data.frame(spam)
 
 ## Part 2
 
-```{r echo=FALSE}
+```{r echo=TRUE,eval=TRUE}
 #building test and training sets
 n<-dim(spam)[1];
 test <- spam[seq(10, n, 10), ]
@@ -36,7 +190,7 @@ train <- spam[-c(seq(10, n, 10)), ]
 
 ## Part 3
 
-```{r echo=TRUE}
+```{r echo=TRUE,eval=TRUE}
 #train, predict, performance assessment of linear model
 fit.l <- lda(V58 ~. , data = train, prior = c(0.5, 0.5))
 predict.l <- predict(fit.l, test)
@@ -44,7 +198,7 @@ accuracy.l <- sum(predict.l$class == test[, 58])/length(predict.l$class)
 accuracy.l
 ```
 
-```{r echo=TRUE}
+```{r echo=TRUE,eval=TRUE}
 #train, predict, performance assessment of quadratic model
 fit.q <- qda(V58 ~. , data = train, prior = c(0.5, 0.5))
 predict.q <- predict(fit.q, test)
@@ -54,7 +208,7 @@ accuracy.q
 
 ## Part 4
 
-```{r echo=TRUE}
+```{r echo=TRUE,eval=TRUE}
 #train, predict, performance assessment of k nearest neighbours model (unnormalised)
 predict.k <- knn(train = train, test = test, cl = train[1:dim(train)[1], 58], k=3)
 accuracy.k <- sum(predict.k == test[,58])/length(predict.k)
@@ -84,4 +238,4 @@ accuracy.kn
 ```
 
 
-Observe that the LDA model had a 92.0% accuracy, while the QDA model had a 83.7% accuracy. The 3-nearest-neighbour model had 83.9% accuracy when unnormalised while it had 90.4% accuracy when normalised.
+Observe that the LDA model had a 92.0% accuracy, while the QDA model had a 83.7% accuracy. The 3-nearest-neighbour model had 83.9% accuracy when unnormalised while it had 90.7% accuracy when normalised. Hence the most accurate model in this instance is the LDA model.
