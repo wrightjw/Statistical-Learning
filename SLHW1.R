@@ -40,6 +40,6 @@ for (i in 1:57){
   test[,i] <- (test[, i] - mus[i])/sigmas[i]
 }
 
-predict.kn <- knn(train = train[, 1:57], test = test[, 1:57], cl = train[, 58], k=3)
+predict.kn <- knn(train = train[, 1:57], test = test[, 1:57], cl = train[, 57], k=3)
 accuracy.kn <- sum(predict.kn == test[, 57])/length(predict.kn)
 accuracy.kn
